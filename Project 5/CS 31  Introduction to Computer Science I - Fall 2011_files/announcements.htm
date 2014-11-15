@@ -1,0 +1,317 @@
+<!--?xml version="1.0" encoding="ISO-8859-1" ?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+ <title>CS 31 Project 5, Fall 2011</title>
+</head>
+<body>
+<div align="right">
+Fall 2011 CS 31 
+</div>
+<div align="center">
+<h2>Programming Assignment 5<br>
+Mystery Word</h2>
+<p>
+<strong>Time due: 9:00 PM Tuesday, November 15</strong>
+</p>
+</div>
+<!--
+<p style="font-size: smaller">
+Before you ask questions about this specification, see if your question has
+already been addressed by the <a href="faq.html">Project 5 FAQ</a>.  And
+read the FAQ before you <a href="../../Submit/submission.cgi?asst=5">turn
+in this project</a>, to be sure you didn't misinterpret anything.
+</p>
+-->
+<p>
+You have been contracted by the producers of the highly-rated Mystery Word
+TV game show to write a program that lets fans play a home version of the
+game.  Here's how one round of the game works:  The computer picks a mystery
+word of four to six letters and tells the player how many letters are in the
+word.  The player tries to determine the mystery word by presenting
+the computer with a series of trial words.  Each trial word is a four to six
+letter word.  If the trial word is the mystery word, the player wins.
+Otherwise, the computer responds to the trial word with an integer from 0
+to the length of the mystery word, indicating the number of letters in the
+trial word that are in the mystery word. For example, if the mystery word
+is EAGER, the response to the trial word GOOSE would be 2 (because of the
+G and one E), the response to EERIE would be 3 (the R and two Es), the
+response to GAME would be 3 (the G, the A, and the E), the response to
+BONUS would be 0 (no letters in common), and the response to AGREE or to
+GREASE would be 5 (one A, one G, one R, and two Es).  The player's score
+for each round is the number of trial words needed to get the correct word
+(counting the trial word that matched the mystery word).
+</p><p>
+Your program must start by asking the player how many rounds to play, and then
+play that many rounds of the game.  After each round, the program must
+display some statistics about how well the player has played the rounds so
+far:  the average score, the minimum score, and the maximum score.
+</p><p>
+Here is an example of how the program must interact with the player
+(player input is in <strong>boldface</strong>):
+</p>
+<pre>	How many rounds do you want to play? <strong>3</strong>
+
+	Round 1
+	The mystery word is 5 letters long
+	Trial word: <strong>assert</strong>
+	3
+	Trial word: <strong>xyzzy</strong>
+	I don't know that word
+	Trial word: <strong>bred</strong>
+	2
+	Trial word: <strong>mucus</strong>
+	0
+	Trial word: <strong>never</strong>
+	4
+	Trial word: <strong>enter</strong>
+	4
+	Trial word: <strong>raven</strong>
+	You got it in 7 tries
+	Average: 7.00, minimum: 7, maximum: 7
+
+	Round 2
+	The mystery word is 5 letters long
+	Trial word: <strong>eerie</strong>
+	3
+	Trial word: <strong>game</strong>
+	3
+	Trial word: <strong>agree</strong>
+	5
+	Trial word: <strong>eager</strong>
+	You got it in 4 tries
+	Average: 5.50, minimum: 4, maximum: 7
+
+	Round 3
+	The mystery word is 4 letters long
+	Trial word: <strong>monkey</strong>
+	0
+	Trial word: <strong>Hello</strong>
+	Your trial word must be a word of 4 to 6 lower case letters
+	Trial word: <strong>what?</strong>
+	Your trial word must be a word of 4 to 6 lower case letters
+	Trial word: <strong>wrap-up</strong>
+	Your trial word must be a word of 4 to 6 lower case letters
+	Trial word: <strong>stop it</strong>
+	Your trial word must be a word of 4 to 6 lower case letters
+	Trial word: <strong>sigh</strong>
+	You got it in 6 tries
+	Average: 5.67, minimum: 4, maximum: 7
+</pre>
+<p>
+You can assume the user will always enter an integer for the number of rounds
+(since you haven't learned a clean way to check that yet).  If the number of
+rounds entered is not positive, write the message <code>The number of rounds
+must be positive</code> and end the program.
+</p>
+<p>
+In order for us to thoroughly test your program, it must have at least the
+following components:
+</p>
+<ul>
+<li>
+<p>A main routine that declares an array of C strings.  This array exists to
+hold the list of words from which the mystery word will be selected.  The
+response to a trial word will be an integer only if the trial word is in
+this array.  (From the example transcript above, we deduce that "xyzzy" is
+not in the array.)  The declared number of C strings in the array must be
+at least 9000.  (You can declare it to be larger if you like, and you
+don't have to use every element.)
+</p><p>
+Each element of the array must be capable of holding a C string of
+length up to 6 letters (thus 7 characters counting the zero byte).  So a
+declaration such as <code>char wordList[9000][7];</code> is fine, although
+something like <code>char wordList[MAXWORDS][MAXWORDLENGTH+1];</code>, with the
+constants suitably defined, would be stylistically better.
+</p><p>
+Along with the array, your main routine must declare an int that will
+contain the actual number of words in the array (i.e., elements 0 through
+one less than that number are the ones that contain the C strings of interest.
+The number may well be smaller than the declared size of the array,
+because for test purposes you may not want to fill the entire array.
+</p><p>
+Your main routine must call <code>loadWords</code> (see below) to fill the
+array.
+</p>
+</li>
+<li>
+<p>
+A function named <code>loadWords</code> with the following prototype:
+</p>
+<pre>	int loadWords(char words[][7], int maxWords);
+</pre>
+<p>
+(Instead of <code>7</code>, you can use something like
+<code>MAXWORDLENGTH+1</code>, where <code>MAXWORDLENGTH</code> is declared
+to be the constant 6.)  This function puts words into the
+<code>words</code> array and returns the number of words put into the
+array.  The array must be able to hold at least <code>maxWords</code>
+words.  You <em>must</em> call this function exactly once, before you
+start playing any of the rounds of the game.  If your main routine
+declares <code>wordList</code> to be an array of 10000 C strings and
+<code>nWords</code> to be an int, you'll probably invoke this function
+like this:
+</p>
+<pre>	int nWords = loadWords(wordList, 10000);
+</pre>
+<p>
+If you wish, you may use <a href="http://cs.ucla.edu/classes/fall11/cs31/Projects/5/loadWords.cpp.txt">this implementation of
+<code>loadWords</code></a>.  (Don't worry if you don't understand every
+part of the implementation.)  It fills the array with the
+four-to-six-letter words found in a file named <code>Z:/words.txt</code>
+that you would put in the top level folder on your network drive (the
+Samba Server) on a SEASnet machine.  You may use <a href="http://cs.ucla.edu/classes/fall11/cs31/Projects/5/words.txt">this
+7265-word file</a> if you want a challenging game.  If you want to use this
+implementation of <code>loadWords</code>, but call the file something else
+or put it somewhere else, change the string literal <code>"Z:/words.txt"</code>
+in the function appropriately.
+</p>
+<p>
+Another way to implement <code>loadWords</code> for doing simple testing is
+something like this:
+</p>
+<pre>	int loadWords(char words[][7], int maxWords)
+	{
+	    strcpy(words[0], "eager");
+	    strcpy(words[1], "goose");
+	    return 2;
+	}
+</pre>
+<p>
+Whatever implementation of <code>loadWords</code> you use, it must return an
+int no greater than <code>maxWords</code>.  If <code>loadWords</code>
+returns a value less than 1, your main routine can do whatever reasonable
+thing you want, provided its behavior is not undefined.  One reasonable
+thing to do would be to write a message like <code>No words were loaded,
+so I can't play the game</code> and terminate the program.  When we test
+your program, we will replace your implementation of
+<code>loadWords</code> with our own special testing implementation.
+</p><p>
+If <code>loadWords</code> returns a value in the range from 1 to
+<code>maxWords</code> inclusive, your program must write no output to
+<code>cout</code> other than what is required by this spec. If you want to
+print things out for debugging purposes, write to <code>cerr</code>
+instead of <code>cout</code>.  When we test your program, we will cause
+everything written to <code>cerr</code> to be discarded instead — we
+will never see that output, so you may leave those debugging output
+statements in your program if you wish.
+</p>
+</li>
+<li>
+A function named <code>manageOneRound</code> with the following prototype:
+<pre>	int manageOneRound(char words[][7], int num, int wordnum);
+</pre>
+<p>
+(Again, instead of <code>7</code>, you can use something like
+<code>MAXWORDLENGTH+1</code>.)  Using <code>words[wordnum]</code> as the
+mystery word, this function plays one round of the game.  It returns the
+score for that round.  In the transcript above, this function is
+responsible for this much of the round 1 output, no more, no less:
+</p>
+<pre>	Trial word: <strong>assert</strong>
+	3
+	Trial word: <strong>xyzzy</strong>
+	I don't know that word
+	Trial word: <strong>bred</strong>
+	2
+	Trial word: <strong>mucus</strong>
+	0
+	Trial word: <strong>never</strong>
+	4
+	Trial word: <strong>raven</strong>
+</pre>
+<p>
+Your program must call this function to play each round of the game.  Notice
+that this function does <em>not</em> select a random number; the
+<em>caller</em> of this function does, and passes it as the third argument.
+Notice also that this function does <em>not</em> write the message about
+the player successfully determining the mystery word.  <strong>If you do
+not observe these requirements, your program will fail most test
+cases.</strong>
+</p><p>
+The parameter <code>num</code> represents the number of words in the array;
+if it is not positive, or if <code>wordnum</code> is less than 0 or greater
+than or equal to <code>num</code>, then <code>manageOneRound</code>
+must return −1 without writing anything to <code>cout</code>.
+</p>
+</li>
+</ul>
+<p>
+To make the program interesting, it must pick mystery words at random.
+<a href="http://cs.ucla.edu/classes/fall11/cs31/Projects/5/random.html">This brief tutorial</a> describes the tools you need to
+do this.
+</p><p>
+Your program must <strong>not</strong> use any std::string objects; you must
+use C strings.  You may assume (i.e., we promise when testing your program)
+that any line entered in response to the trial word prompt will contain
+fewer than 100 characters (not counting the newline at the end).
+</p><p>
+Your program must <strong>not</strong> use any global variables whose values
+may change.  Global <em>constants</em> are all right; it's perfectly fine
+to declare <code>const int MAXWORDLENGTH = 6;</code> globally, for example.
+The reason for this restriction is that part of our testing will involve
+replacing your <code>manageOneRound</code> function with ours to test some
+aspects of your <code>main</code> function, or replacing your
+<code>main</code> with ours to test aspects of your
+<code>manageOneRound</code>.  For this reason, you must not use any
+non-const global variables to communicate between these functions, because
+our versions won't know about them; all communication between these
+functions must be through the parameters (for <code>main</code> to tell
+<code>manageOneRound</code> the words, number of words, and mystery word
+number for a round), and the return value (for <code>manageOneRound</code>
+to tell <code>main</code> the score for that round).  Global constants are
+OK because no function can change their value in order to use them to pass
+information to another function.
+</p><p>
+Microsoft made a controversial decision to issue by default a warning when
+using certain functions from the standard C and C++ libraries (e.g.,
+<code>strcpy</code>).  These warnings are not relevant in this class; to
+eliminate them, put the following line in your program <em>before</em> any
+of your <code>#include</code>s:
+</p>
+<pre>	#define _CRT_SECURE_NO_DEPRECATE
+</pre>
+<p></p><p>
+It is OK and harmless to leave that line in when you build your program
+using g++.
+</p><p>
+What you will turn in for this assignment is a zip file containing these
+two files and nothing more:
+</p>
+<ol>
+<li>
+<p>
+A text file named <strong>game.cpp</strong> that contains the source
+code for your C++ program.  Your source code should have helpful comments
+that tell the purpose of the major program segments and explain any tricky
+code.
+</p>
+</li>
+<li>A file named <strong>report.doc</strong> or <strong>report.docx</strong>
+(in Microsoft Word format), or <strong>report.txt</strong> (an ordinary text
+file) that contains:
+<ol style="list-style: lower-alpha">
+<li>A brief description of notable obstacles you overcame.
+</li>
+<li><a name="designdescription"></a>
+A description of the design of your program.  You should use
+<a href="http://cs.ucla.edu/classes/fall11/cs31/pseudocode.html">pseudocode</a> in this description where it
+clarifies the presentation.
+</li>
+</ol>
+Your report does not need to describe the data you might use to test this
+program.
+</li>
+</ol>
+<p>
+By November 14, there will be links on the class webpage that will enable you
+<!--
+The <a href="../../Submit/submission.cgi?asst=5">turn in Project 5</a> link
+on the class webpage enables you
+-->
+to turn in your zip file electronically.  Turn in the file by the due time
+above.
+</p>
+
+
+</body></html>

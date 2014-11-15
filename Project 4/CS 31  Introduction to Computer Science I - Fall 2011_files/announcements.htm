@@ -1,0 +1,360 @@
+<!--?xml version="1.0" encoding="ISO-8859-1" ?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+ <title>CS 31 Project 4, Fall 2011</title>
+</head>
+<body>
+<div align="right">
+Fall 2011 CS 31 
+</div>
+<div align="center">
+<h2>Programming Assignment 4<br>
+Array of Sunshine</h2>
+<p>
+<strong>Time due: 9:00 PM Thursday, November 3</strong>
+</p>
+</div>
+<p style="font-size: smaller">
+Before you ask questions about this specification, see if your question has
+already been addressed by the <a href="http://cs.ucla.edu/classes/fall11/cs31/Projects/4/faq.html">Project 4 FAQ</a>.  And read
+the FAQ before you <!--a href="../../Submit/submission.cgi?asst=4"-->turn in
+this project<!--/a-->, to be sure you didn't misinterpret anything.
+</p>
+<p>
+As you gain experience with arrays, you'll discover that many applications
+do the same kinds of things with them (e.g., find where an item is in an array,
+or check whether two arrays differ).  You'll find that it's helpful to have a
+library of useful functions that manipulate arrays.  (For our purposes now, a
+library is a collection of functions that developers can call instead of having
+to write them themselves.  For a library to be most useful, the functions in
+it should be related and organized around a central theme.  For example, a
+screen graphics library might have functions that allow you to draw shapes like
+lines and circles on the screen, move them around, fill them with color, etc.
+In this view, the Standard C++ library is really a collection of libraries:
+a string library, a math library, an input/output library, and much more.)
+</p><p>
+Your assignment is to produce a library that provides functions for many
+common manipulations of arrays of strings.  For example, one function will
+find where a string occurs in an unordered array of strings.  Another will
+change the order of strings in an array.  For each function you must write,
+this specification will tell you its interface (what parameters it takes,
+what it returns, and <em>what</em> it must do).  It's up to you to decide
+on the implementation (<em>how</em> it will do it).
+</p><p>
+The source file you turn in will contain all the functions and a main routine.
+You can have the main routine do whatever you want, because we will rename it
+to something harmless, never call it, and append our own main routine to your
+file.  Our main routine will thoroughly test your functions.  You'll probably
+want your main routine to do the same.  If you wish, you may write functions
+in addition to those required here.  We will not directly call any such
+additional functions.
+</p><p>
+The program you turn in must build successfully, and during execution, no
+function (other than main) may read anything from <code>cin</code> or
+write anything to <code>cout</code>.  If you want to print things out for
+debugging purposes, write to <code>cerr</code> instead of
+<code>cout</code>.  When we test your program, we will cause everything
+written to <code>cerr</code> to be discarded instead — we will never
+see that output, so you may leave those debugging output statements in
+your program if you wish.
+</p><p>
+All of the functions you must write take at least two parameters:  an
+array of strings, and the number of items the function will consider in the
+array, starting from the beginning.  For example, in
+</p>
+<pre>string people[5] = { "peter", "lois", "meg", "chris", "stewie" };
+int i = lookup(people, 3, "stewie");  // should return -1 (not found)
+</pre>
+<p>
+even though the array has 5 elements, only the first 3 had values we were
+interested in for this call to the function; the function must not examine
+the others.
+</p><p>
+<a id="badargs"></a>
+Notwithstanding each function's behavior described below, all functions
+that return an int must return −1 if they are passed any bad
+arguments (e.g. a negative array size, or a position that would require
+looking at the contents of an element past the last element we're interested
+in).  Unless otherwise noted, passing to the function an array size of 0 is
+not an error; it merely indicates the function should examine no elements
+of the array.
+</p><p>
+The one error your function implementations don't have to handle,
+because they can't, is when the caller of the function lies and says the
+array is bigger than it really is.  For example, in this situation, the
+function <code>lookup</code> can't possibly know that the caller is lying
+about the number of interesting items in the array:
+</p>
+<pre>string people[5] = { "peter", "lois", "meg", "chris", "stewie" };
+int i = lookup(people, 25, "brian");  // Bad call of function, but
+		// your lookup implementation doesn't have to check for
+		// this, because it can't.
+</pre>
+<p>
+To make your life easier, whenever this specification talks about strings
+being equal or about one string being less than or greater than another,
+the case of letters matters.  This means that you can simply use comparison
+operators like == or &lt; to compare strings.  Because of the character
+collating sequence, all upper case letters come before all lower case letters,
+so don't be surprised.  The <a href="http://cs.ucla.edu/classes/fall11/cs31/Projects/4/faq.html">FAQ</a> has a note about
+string comparisons.
+</p>
+<p>
+Here are the functions you must implement:
+</p>
+<dl>
+<dt>
+<code>int appendToAll(string a[], int n, string value);</code>
+</dt><dd>
+Append <code>value</code> to the end of each of the <code>n</code>
+elements of the array and return <code>n</code>.  [Of course, in this and
+other functions, if <code>n</code> is negative, the
+<a href="#badargs">paragraph above that starts "Notwithstanding"</a>
+trumps this by requiring that the function return −1.  Also, in the
+description of this function and the others, when we say "the array", we
+mean the <code>n</code> elements that the function is aware of.]  For example:
+<pre>string folks[6] = { "george", "lucille", "gob", "michael", "lindsay", "buster" };
+int j = appendToAll(people, 6, "!!!");  // returns 6
+    // now folks[0] is "george!!!", folks[1] is "lucille!!!", ...,
+    // and folks[5] is "buster!!!"
+</pre>
+</dd><dt>
+<code>int lookup(const string a[], int n, string target);</code>
+</dt><dd>
+Return the position of the first string in the array that is equal to
+<code>target</code>.  Return −1 if there is no such string.  As noted
+above, case matters:  Do not consider "GeORge" to be equal to "gEoRgE".
+<br><br></dd><dt>
+<code>int positionOfMax(const string a[], int n);</code>
+</dt><dd>
+Return the position of a string in the array such that that string is &gt;=
+every string in the array.  If there is more than one such string, return the
+smallest position of such a string.  Return −1 if the array has no
+elements.  For example:
+<pre>string folks[6] = { "george", "lucille", "gob", "michael", "lindsay", "buster" };
+int k = positionOfMax(folks, 8);   // returns 3, since  michael  is latest
+                                   // in alphabetic order
+</pre>
+</dd><dt>
+<code>int rotateLeft(string a[], int n, int pos);</code>
+</dt><dd>
+Eliminate the item at position <code>pos</code> by copying all elements after
+it one place to the left.  Put the item that was thus eliminated into the last
+position of the array.  Return the original position of the item that was
+moved to the end.  Here's an example:
+<pre>string humans[5] = { "homer", "marge", "bart", "lisa", "maggie" };
+int m = rotateLeft(humans, 5, 1);  // returns 1
+    // himans now contains:  "homer"  "bart"  "lisa"  "maggie"  "marge"
+</pre>
+</dd><dt>
+<code>int rotateRight(string a[], int n, int pos);</code>
+</dt><dd>
+Eliminate the item at position <code>pos</code> by copying all elements before
+it one place to the right.  Put the item that was thus eliminated into the
+first position of the array.  Return the original position of the item that was
+moved to the beginning.  Here's an example:
+<pre>string humans[5] = { "homer", "marge", "bart", "lisa", "maggie" };
+int p = rotateRight(humans, 5, 2);  // returns 2
+    // humans now contains:  "bart"  "homer"  "marge"  "lisa"  "maggie"
+</pre>
+</dd><dt>
+<code>int flip(string a[], int n);</code>
+</dt><dd>
+Reverse the order of the elements of the array and return <code>n</code>.
+For example,
+<pre>string beings[6] = { "claire", "phil", "", "haley", "alex", "luke" };
+int q = flip(beings, 4);  // returns 4
+    // beings now contains:  "haley"  ""  "phil"  "claire"  "alex"  "luke"
+</pre>
+</dd><dt>
+<code>int differ(const string a1[], int n1, const string a2[], int n2);</code>
+</dt><dd>
+Return the position of the first corresponding elements of <code>a1</code>
+and <code>a2</code> that are not equal.  <code>n1</code> is the number of
+interesting elements in <code>a1</code>, and <code>n2</code> is the number
+of interesting elements in <code>a2</code>.  If the arrays are equal up to
+the point where one or both runs out, return the smaller of
+<code>n1</code> and <code>n2</code>.  For example,
+<pre>string beings[6] = { "claire", "phil", "", "haley", "alex", "luke" };
+string group[4] = { "claire", "phil", "mitchell", "luke" };
+int r = differ(beings, 6, group, 4);  //  returns 2
+int s = differ(beings, 2, group, 1);  //  returns 1
+</pre>
+</dd><dt>
+<code>int subsequence(const string a1[], int n1, const string a2[], int n2);</code>
+</dt><dd>
+If all <code>n2</code> elements of <code>a2</code> appear in <code>a1</code>,
+consecutively and in the same order, then return the position in <code>a1</code>
+where that subsequence begins.  If the subsequence appears more than once in
+<code>a1</code>, return the smallest such beginning position.  Return −1
+if <code>a1</code> does not contain <code>a2</code> as a contiguous
+subsequence.  For example,
+<pre>string family[10] = { "elyse", "steven", "alex", "mallory", "jennifer", "andrew" };
+string names1[10] = { "steven", "alex", "mallory" };
+int t = subsequence(family, 6, names1, 3);  // returns 1
+string names2[10] = { "elyse", "mallory" };
+int u = subsequence(family, 5, names2, 2);  // returns -1
+</pre>
+</dd><dt>
+<code>int lookupAny(const string a1[], int n1, const string a2[], int n2);</code>
+</dt><dd>
+Return the smallest position in <code>a1</code> of an element that is equal to
+any of the elements in <code>a2</code>.  Return −1 if no element of
+<code>a1</code> is equal to any element of <code>a2</code>.  For example,
+<pre>string family[10] = { "elyse", "steven", "alex", "mallory", "jennifer", "andrew" };
+string set1[10] = { "skippy", "jennifer", "mallory", "steven" };
+int v = lookupAny(family, 6, set1, 4);  // returns 1 (a1 has "steven" there)
+string set2[10] = { "skippy", "nick" };
+int w = lookupAny(family, 6, set2, 2);  // returns -1 (a1 has none)
+</pre>
+</dd><dt>
+<code>int split(string a[], int n, string splitter);</code>
+</dt><dd>
+Rearrange the elements of the array so that all the elements whose
+value is &lt; <code>splitter</code> come before all the other elements, and
+all the elements whose value is &gt; <code>splitter</code> come after all the
+other elements.  Return the position of the first element that, after the
+rearrangement, is not &lt; <code>splitter</code>, or <code>n</code> if
+there are none.  For example,
+<pre>string kin[6] = { "hal", "lois", "francis", "reese", "malcolm", "dewey" };
+int x = split(kin, 6, "jamie");  //  returns 3
+	// kin might now be
+	//      "hal"  "dewey"  "francis"  "reese"  "malcolm"  "lois"
+	// or   "francis"  "hal"  "dewey"  "malcolm"  "lois"  "reese"
+	// or one of several other orderings.
+	// The first 3 elements are &lt; "jamie"; the last 3 aren't.
+string sibs[4] = { "francis", "reese", "malcolm", "dewey" };
+int y = split(sibs, 4, "francis");  //  returns 1
+	// sibs must now be either
+	//      "dewey"  "francis"  "reese"  "malcolm"
+	// or   "dewey"  "francis"  "malcolm"  "reese"
+	// All elements &lt; "francis" (i.e., "dewey") come before all others.
+	// All elements &gt; "francis" (i.e., "malcolm" and "reese") come
+	//      after all others.
+</pre>
+</dd>
+</dl>
+<p>
+For each of the functions <code>rotateLeft</code>, <code>rotateRight</code>,
+<code>flip</code>, and <code>split</code>, if the function is correctly
+implemented, you will earn one bonus point for that function if it does its job
+without creating any additional array.
+</p><p>
+Your program may <em>not</em> use any function templates from the algorithms
+portion of the Standard C++ library.  If you don't know what the previous
+sentence is talking about, you have nothing to worry about.  If you do know,
+and you violate this requirement, you will be required to take an oral
+examination to test your understanding of the concepts and architecture of
+the STL.
+</p><p>
+The correctness of your program must not depend on undefined program behavior.
+Your program could not, for example, assume anything about <code>t</code>'s
+value in the following, or even whether or not the program crashes:
+</p>
+<pre>	int main()
+	{
+	    string s[3] = { "peter", "lois", "stewie" };
+	    string t = s[3];   // position 3 is out of range
+	    …
+</pre>
+<p>
+What you will turn in for this assignment is a zip file containing these
+two files and nothing more:
+</p>
+<ol>
+<li>
+<p>
+A text file named <strong>array.cpp</strong> that contains the source
+code for your C++ program.  Your source code should have helpful comments
+that explain any non-obvious code.
+</p>
+</li>
+<li>A file named <strong>report.doc</strong> or <strong>report.docx</strong>
+(in Microsoft Word format), or <strong>report.txt</strong> (an ordinary text
+file) that contains:
+<ol style="list-style: lower-alpha">
+<li>A brief description of notable obstacles you overcame.
+</li>
+<li>
+A list of the test data that could be used to thoroughly test your
+functions, along with the reason for each test.  You must note which test
+cases your program does not handle correctly. (This could happen if you
+didn't have time to write a complete solution, or if you ran out of time
+while still debugging a supposedly complete solution.)  Notice that most of
+this portion of your report can be written just after you read the
+requirements in this specification, before you even start designing your
+program.
+</li>
+</ol>
+</li>
+</ol>
+<p>
+How nice!  Your report this time doesn't have to contain any design
+documentation.
+</p><p>
+As with Project 3, a nice way to test your functions is to use the
+<code>assert</code> facility from the standard library.  As an
+example, here's a very incomplete set of tests for Project 4:
+</p>
+<pre>	#include &lt;iostream&gt;
+	#include &lt;string&gt;
+	#include &lt;cassert&gt;
+	using namespace std;
+
+	int main()
+	{
+	    string h[7] = { "peter", "lois", "meg", "chris", "", "stewie", "meg" };
+	    assert(lookup(h, 7, "stewie") == 5);
+	    assert(lookup(h, 7, "meg") == 2);
+	    assert(lookup(h, 2, "meg") == -1);
+	    assert(positionOfMax(h, 7) == 5);
+
+	    string g[4] = { "peter", "lois", "chris", "stewie" };
+	    assert(differ(h, 4, g, 4) == 2);
+	    assert(appendToAll(g, 4, " g") == 4 &amp;&amp; g[0] == "peter g" &amp;&amp; g[3] == "stewie g");
+	    assert(rotateLeft(g, 4, 1) == 1 &amp;&amp; g[1] == "chris g" &amp;&amp; g[3] == "lois g");
+
+	    string e[4] = { "meg", "chris", "", "stewie" };
+	    assert(subsequence(h, 7, g, 4) == 2);
+	    assert(rotateRight(e, 4, 1) == 1 &amp;&amp; f[0] == "chris" &amp;&amp; f[2] == "");
+	
+	    string f[3] = { "chris", "meg", "brian" };
+	    assert(lookupAny(h, 7, f, 3) == 2);
+	    assert(flip(f, 3) == 1 &amp;&amp; f[0] == "brian" &amp;&amp; f[2] == "chris");
+	
+	    assert(split(h, 7, "meg") == 3);
+	
+	    cout &lt;&lt; "All tests succeeded" &lt;&lt; endl;
+	}
+</pre>
+<p>
+The reason for the one line of output at the end is to ensure that you can
+distinguish the situation of all tests succeeding from the case where one
+test silently crashes the program.
+</p><p>
+Make sure that if you were to replace your main routine with the one above,
+your program would build successfully under both Visual C++ and g++. 
+(This means that even if you haven't figured out how to implement some of
+the functions, you must still have <em>some</em> kind of implementations
+for them, even if those implementations do nothing more than immediately
+return, say, 42.)  If the program built with that main routine happens to
+run successfully, you'll probably get a pretty good correctness score.
+</p><p>
+By November 2, there will be links on the class webpage that will enable you 
+<!--
+The <a href="../../Submit/submission.cgi?asst=4">turn in Project 4</a> link on
+the class webpage enables you
+-->
+to turn in your zip file electronically.  Turn in the file by the due time
+above.  Give yourself enough time to be sure you can turn something in,
+because we will not accept excuses like "My network connection at home was
+down, and I didn't have a way to copy my files and bring them to a SEASnet
+machine."  There's a lot to be said for turning in a preliminary version of
+your program and report early (You can always overwrite it with a later
+submission).  That way you have something submitted in case there's a problem
+later.
+</p>
+
+
+</body></html>
